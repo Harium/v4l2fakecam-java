@@ -19,7 +19,22 @@ gcc -I/usr/lib/jvm/java-1.8.0/include -I<PATH TO JNI_MD.H> -lrt -lpthread -fPIC 
 Fedora 30 Example:
 
 ```
-gcc -I/usr/lib/jvm/java-1.8.0/include -I/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-0.fc30.x86_64/include/linux/ -lrt -lpthread -fPIC -shared -o libfakecam.so fakecam.c
+gcc -I/usr/lib/jvm/java-1.8.0/include -I/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-0.fc30.x86_64/include/linux/ -lrt -lpthread -fPIC -shared -o libfakecam.so FakeCam.c
 ```
 
 It will produce a libfakecam.so file
+
+## Install v4l2loopback
+Go to: https://github.com/umlaeute/v4l2loopback/releases
+Dowload and extract the desired version
+```
+sudo make
+sudo make install
+sudo modprobe v4l2loopback
+```
+
+### Check the new video device
+```
+ls -ltrh /dev/video*
+```
+
