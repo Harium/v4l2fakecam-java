@@ -1,11 +1,11 @@
 package examples;
 
+import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.ds.ffmpegcli.FFmpegCliDriver;
 import com.harium.hci.fakecam.FakeCam;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 
 /**
  * Create output device
@@ -15,21 +15,26 @@ import javax.imageio.ImageIO;
  * ls -ltrh /dev/video*
  *
  * Check if output is correct
- * ffplay /dev/video2
+ * ffplay -vf hflip /dev/video2
  * xawtv -c /dev/video2
  */
-public class ImageExample {
+public class CameraExample {
 
   public static final int WIDTH = 640;
   public static final int HEIGHT = 480;
-  public static final String DEVICE = "/dev/video2";
+
+  public static final String CAPTURE_DEVICE = "/dev/video0";
+  public static final String OUTPUT_DEVICE = "/dev/video2";
 
   public static void main(String[] args) {
-    BufferedImage image = loadImage();
+    Webcam.setDriver(new FFmpegCliDriver());
+    Webcam webcam = Webcam.getWebcamByName(CAPTURE_DEVICE);
+    webcam.setViewSize(new Dimension(WIDTH, HEIGHT));
+    webcam.open();
 
     FakeCam cam = new FakeCam();
-    int dev = cam.open(DEVICE, WIDTH, HEIGHT);
-    System.out.println("Open device: " + DEVICE);
+    int dev = cam.open(OUTPUT_DEVICE, WIDTH, HEIGHT);
+    System.out.println("Open device: " + OUTPUT_DEVICE);
 
     if (dev < 0) {
       return;
@@ -38,13 +43,15 @@ public class ImageExample {
     byte[] frame = new byte[WIDTH * HEIGHT * 3];
 
     while (true) {
+      BufferedImage image = webcam.getImage();
+      // Apply your effects here
       drawImage(frame, image);
 
-      try {
+      /*try {
         Thread.sleep(1);
       } catch (InterruptedException e) {
         e.printStackTrace();
-      }
+      }*/
 
       boolean success = cam.writeFrame(dev, frame);
       if (!success) {
@@ -56,31 +63,16 @@ public class ImageExample {
     cam.close(dev);
   }
 
-  private static BufferedImage loadImage() {
-    String path = System.getProperty("user.dir");
-    path += "/src/main/resources/logo.png";
-    BufferedImage image = null;
-    try {
-      image = ImageIO.read(new File(path));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return image;
-  }
-
   private static void drawImage(byte[] frame, BufferedImage image) {
-
     // Draw at center
-    int xOffset = WIDTH / 2 - image.getWidth() / 2;
-    int yOffset = HEIGHT / 2 - image.getHeight() / 2;
 
     for (int y = 0; y < image.getHeight(); y++) {
-      // Flip horizontally
-      //for (int x = image.getWidth() - 1; x >= 0; x--) {
       for (int x = 0; x < image.getWidth(); x++) {
-        int i = ((y + yOffset) * WIDTH + (x + xOffset)) * 3;
+        int i = (y * WIDTH + x) * 3;
 
-        Color color = new Color(image.getRGB(x, y));
+        // Flip Horizontally
+        Color color = new Color(image.getRGB(WIDTH - 1 - x, y));
+        //Color color = new Color(image.getRGB(x, y));
         int r = color.getRed();
         int g = color.getGreen();
         int b = color.getBlue();

@@ -7,6 +7,25 @@
   <groupId>com.harium.hci</groupId>
   <artifactId>fakecam</artifactId>
   <version>1.0.0</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>7</source>
+          <target>7</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
+  <dependencies>
+    <dependency>
+      <groupId>com.harium</groupId>
+      <artifactId>webcam-capture-driver-ffmpeg-cli</artifactId>
+      <version>0.3.12</version>
+    </dependency>
+  </dependencies>
 
 </project>
