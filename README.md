@@ -5,7 +5,7 @@ A thin JNI layer over v4l2loopback module.
 
 ### Find the location of jni_md.h
 ```shell script
-find / -name jni_md.h 2> /dev/null
+locate "jni_md.h"
 ```
 
 ### Compile the library
